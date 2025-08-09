@@ -14,7 +14,7 @@ d2 = J;       % 慣性モーメント
 
 %% --- 目標モデル（2次系）パラメータ設定
 wm = 10;      % 固有角周波数 [rad/s]
-a1 = 0.7;     % 減衰係数
+a1 = 1.4;     % 減衰係数
 
 gamma_m1 = a1/wm;
 gamma_m2 = 1/wm^2;
@@ -29,7 +29,7 @@ kD = (d2*gamma_m1^2 - d1*gamma_m1*gamma_m2 ...
 %% --- ステップ応答シミュレーション条件
 rc_deg = 30;                  % 指令値 [deg]
 rc = rc_deg*(pi/180);         % [rad]へ変換
-dc = 0.5;                     % 外乱トルク設定（一定値）
+dc = 0;                     % 外乱トルク設定（一定値）
 
 % Simulinkモデル実行
 sim('arm_linear_sim_pi_d_cont');
@@ -38,7 +38,7 @@ sim('arm_linear_sim_pi_d_cont');
 t_sim = double(t(:));          % 列ベクトル化 + double化
 y_sim = double(y(:));          % 出力も列ベクトル化
 
-% 等間隔ベクトル生成（保険）
+% 等間隔ベクトル生成（目標値）
 Ts = mean(diff(t_sim));                     
 t_uniform = (0:Ts:t_sim(end))';             
 
@@ -48,8 +48,10 @@ ym = step(sysGm2, t_uniform) * rc;
 
 %% --- 実応答 vs 目標応答 プロット
 figure(1)
-plot(t_uniform, y_sim*(180/pi), ...
-     t_uniform, ym*(180/pi), '--')
+plot(t,y*(180/pi),t_uniform,ym*(180/pi),'--')
+%plot(t_uniform, y_sim*(180/pi), ...
+%t_uniform, ym*(180/pi), '--')
+
 xlabel('t [s]')
 ylabel('y(t), y_m(t) [deg]')
 legend({'y(t)','y_m(t) (d(t)=0)'}, 'Location', 'SouthEast')
