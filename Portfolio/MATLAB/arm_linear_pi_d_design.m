@@ -66,3 +66,26 @@ sysC2 = kP + kI/s;               % 目標値応答用 PI制御器
 
 sysGyr = zpk(minreal(sysP*sysC2/(1 + sysP*sysC1))); % 目標値→出力
 sysGyd = zpk(minreal(         1/(1 + sysP*sysC1))); % 外乱→出力
+%% --- 根軌跡（ルートローカス）とボード線図の作成
+% 解析対象の選び方：
+% ・L(s)=P(s)C1(s) …… ループ伝達（安定余裕：ゲイン/位相余裕）
+% ・T(s)=PC2/(1+PC1) …… 目標値→出力（相補感度、追従性）
+% ・S(s)=1/(1+PC1) …… 感度（外乱・モデル変動へのロバスト性）
+
+L = minreal(sysP*sysC1);        % ループ伝達
+T = minreal(sysGyr);            % 相補感度（すでに計算済みを利用）
+S = minreal(1/(1 + sysP*sysC1));% 感度
+
+% 根軌跡（ゲインを変えたときの閉ループ極の動き）
+%figure; rlocus(L); grid on;
+%title('Root Locus of L(s)=P(s)C_1(s)');
+
+% Bode（ループ伝達 & 安定余裕）
+%figure; margin(L); grid on;     % bode + ゲイン/位相余裕を一括表示
+%title('Bode & Margins of L(s)=P(s)C_1(s)');
+
+% Bode（TとS：追従性とロバスト性のバランスを見る）
+%figure; bode(T); grid on; title('Bode of T(s) = PC_2/(1+PC_1)');
+%figure; bode(S); grid on; title('Bode of S(s) = 1/(1+PC_1)');
+%margin(L)   % ボード線図上にPM/GMを表示
+%grid on
